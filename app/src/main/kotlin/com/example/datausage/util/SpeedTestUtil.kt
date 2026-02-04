@@ -1,10 +1,13 @@
 package com.example.datausage.util
 
 import com.example.datausage.domain.model.SpeedTestResult
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 class SpeedTestUtil {
 
@@ -13,19 +16,18 @@ class SpeedTestUtil {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    // Using a fast CDN file for testing (e.g., Cloudflare speed test file or similar small asset)
-    // 1MB or 10MB test file. For "lightweight" test, we might only download a chunk or small file.
-    // Using a reliable public URL. 
-    private val DOWNLOAD_URL = "https://speed.cloudflare.com/__down?bytes=1000000" // 1MB for quick test
-    
-    // For upload, we can post to a dummy endpoint, or just skip it if we want super simple.
-    // The prompt asked for "download/upload Mbps", so we should try both or at least download.
-    // Uploading to public endpoints without API key is flaky. I will implement Download only for now as it's most reliable for "simple",
-    // or simulate upload if needed, but the prompt said "simple OkHttp speed test".
-    // I'll stick to Download only for MVP reliability, or maybe a small POST if I can find a public echo.
-    // Let's do Download first.
+    // 10.0.2.2 is the localhost of the host machine from the Android emulator
+    private val BASE_URL = "http://10.0.2.2:8080"
+    private val DOWNLOAD_URL = "$BASE_URL/download"
+    private val UPLOAD_URL = "$BASE_URL/upload"
 
     fun performSpeedTest(): SpeedTestResult {
+        val downloadMbps = testDownload()
+        val uploadMbps = testUpload()
+        return SpeedTestResult(downloadMbps, uploadMbps)
+    }
+
+    private fun testDownload(): Double {
         var start = System.currentTimeMillis()
         var bytesRead = 0L
 
@@ -33,9 +35,9 @@ class SpeedTestUtil {
             val request = Request.Builder().url(DOWNLOAD_URL).build()
             val response = client.newCall(request).execute()
             
-            if (!response.isSuccessful) return SpeedTestResult(0.0, 0.0)
+            if (!response.isSuccessful) return 0.0
             
-            val source = response.body?.source() ?: return SpeedTestResult(0.0, 0.0)
+            val source = response.body?.source() ?: return 0.0
             start = System.currentTimeMillis()
             
             while (true) {
@@ -48,22 +50,47 @@ class SpeedTestUtil {
             val end = System.currentTimeMillis()
             val durationMs = end - start
             
-            if (durationMs == 0L) return SpeedTestResult(0.0, 0.0)
+            if (durationMs == 0L) return 0.0
             
             // Calculate speed
-            // bytes * 8 = bits
-            // duration in sec
-            // Mbps = (bits / 1_000_000) / seconds
-            
             val bits = bytesRead * 8.0
             val seconds = durationMs / 1000.0
-            val mbps = (bits / 1_000_000.0) / seconds
-            
-            return SpeedTestResult(mbps, 0.0) // Upload 0.0 for now
+            return (bits / 1_000_000.0) / seconds
 
         } catch (e: Exception) {
             e.printStackTrace()
-            return SpeedTestResult(0.0, 0.0)
+            return 0.0
+        }
+    }
+
+    private fun testUpload(): Double {
+        try {
+            // Generate 1MB of random data
+            val data = ByteArray(1024 * 1024)
+            Random.nextBytes(data)
+            
+            val requestBody = data.toRequestBody("application/octet-stream".toMediaType())
+            val request = Request.Builder()
+                .url(UPLOAD_URL)
+                .post(requestBody)
+                .build()
+
+            val start = System.currentTimeMillis()
+            val response = client.newCall(request).execute()
+            val end = System.currentTimeMillis()
+            
+            if (!response.isSuccessful) return 0.0
+            
+            val durationMs = end - start
+            if (durationMs == 0L) return 0.0
+
+            val bits = data.size * 8.0
+            val seconds = durationMs / 1000.0
+            return (bits / 1_000_000.0) / seconds
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return 0.0
         }
     }
 }
