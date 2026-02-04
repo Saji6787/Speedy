@@ -10,38 +10,46 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+// Clean Sky Blue Light Theme
+private val LightColorScheme = lightColorScheme(
+    primary = SkyBluePrimary,
+    onPrimary = Color.White,
+    primaryContainer = SkyBlueLight,
+    onPrimaryContainer = SkyBlueDark,
+    secondary = SkyBlueDark,
+    onSecondary = Color.White,
+    background = WhiteBackground,
+    onBackground = TextBlack,
+    surface = OffWhiteSurface,
+    onSurface = TextBlack,
+    error = ErrorRed
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = PrimaryColor,
-    secondary = SecondaryColor,
-    tertiary = TertiaryColor
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+// Dark Theme (Dark Blue background to keep "Sky/Space" feel, as "White" in dark mode is blinding)
+// But to strictly follow "Tone dominan putih dan biru langit", we might prioritize Light mode.
+// We will make Dark mode a "Night Sky" version.
+private val DarkColorScheme = darkColorScheme(
+    primary = SkyBlueLight,
+    onPrimary = SkyBlueDark,
+    primaryContainer = SkyBlueDark,
+    onPrimaryContainer = SkyBlueLight,
+    background = Color(0xFF102027), // Dark Blue Grey
+    onBackground = Color(0xFFE1E2E1),
+    surface = Color(0xFF1C2830),
+    onSurface = Color(0xFFE1E2E1)
 )
 
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // We disable dynamic color to force our Sky Blue branding
+    dynamicColor: Boolean = false, 
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -52,12 +60,13 @@ fun AppTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false // White text on Blue status bar
         }
     }
 

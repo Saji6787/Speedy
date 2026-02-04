@@ -34,6 +34,7 @@ import com.example.datausage.ui.components.UsageCard
 @Composable
 fun HomeScreen(
     app: App,
+    onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: HomeViewModel = viewModel(
@@ -45,6 +46,14 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Speedy Data Monitor") },
+                actions = {
+                    androidx.compose.material3.IconButton(onClick = onNavigateToSettings) {
+                        androidx.compose.material3.Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Settings,
+                            contentDescription = "Settings"
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary

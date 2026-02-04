@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val app = application as App
-                    HomeScreen(app = app)
+                    AppRoot(app = app)
                 }
             }
         }

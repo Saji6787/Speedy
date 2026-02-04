@@ -2,14 +2,18 @@ package com.example.datausage.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Sky Blue & White Theme
+val SkyBluePrimary = Color(0xFF0288D1) // Deep Sky Blue
+val SkyBlueLight = Color(0xFFB3E5FC)   // Light Sky Blue
+val SkyBlueDark = Color(0xFF01579B)    // Darker Blue for accents
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val WhiteBackground = Color(0xFFFFFFFF)
+val OffWhiteSurface = Color(0xFFF5F7FA) // Very light grey-blue tint for headers/cards
 
-val PrimaryColor = Color(0xFF006C50) // Emerald Greenish
-val SecondaryColor = Color(0xFF4C6359)
-val TertiaryColor = Color(0xFF3E6373)
+val TextBlack = Color(0xFF191C1E)
+val TextGrey = Color(0xFF707070)
+
+val ErrorRed = Color(0xFFBA1A1A)
+
+// Keeping legacy names or mapping them to new colors if strict compatibility is needed, 
+// but it's better to use correct Material3 names in Theme.kt
