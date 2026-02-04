@@ -1,0 +1,18 @@
+# Gradle
+.gradle/
+build/
+app/build/
+
+# Android/IntelliJ
+.idea/
+*.iml
+local.properties
+*.hprof
+.DS_Store
+
+# Generated files
+captured_shots/
+test_shots/
+
+# Speedy specific
+OutlineForApp.md
